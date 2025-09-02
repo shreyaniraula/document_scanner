@@ -7,13 +7,16 @@ environment:
   sdk: ^3.8.1
 
 dependencies:
-  camera: ^0.11.2
+  camera: ^0.10.5
   flutter:
     sdk: flutter
+  flutter_animate: ^4.5.2
   google_mlkit_entity_extraction: ^0.15.1
   google_mlkit_text_recognition: ^0.15.0
+  image: ^4.5.4
   image_editor_plus: ^1.0.6
-  image_picker: ^1.2.0
+  image_picker: ^1.1.1
+  permission_handler: ^11.4.0
 
 dev_dependencies:
   flutter_test:
@@ -24,5 +27,5 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/pdfs/
+    - assets/frame.png
     - .env
