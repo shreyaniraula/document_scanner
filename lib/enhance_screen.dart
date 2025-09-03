@@ -30,6 +30,7 @@ class _EnhanceScreenState extends State<EnhanceScreen> {
   }
 
   double contrast = 150;
+  double brightness = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -57,17 +58,59 @@ class _EnhanceScreenState extends State<EnhanceScreen> {
                   ),
                 ),
               ),
-              Slider(
-                value: contrast,
-                onChanged: (value) {
-                  contrast = value;
-                  enhanceImage();
-                  setState(() {
-                    contrast;
-                  });
-                },
-                min: 80,
-                max: 200,
+              Container(
+                margin: EdgeInsets.only(left: 20, right: 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.contrast, size: 20, color: Colors.blueAccent),
+                    Expanded(
+                      child: Slider(
+                        value: contrast,
+                        onChanged: (value) {
+                          contrast = value;
+                          enhanceImage();
+                          setState(() {
+                            contrast;
+                          });
+                        },
+                        min: 80,
+                        max: 200,
+                        divisions: 12,
+                        label: contrast.toStringAsFixed(2),
+                        activeColor: Colors.blueAccent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 20, right: 10),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.brightness_5,
+                      size: 20,
+                      color: Colors.blueAccent,
+                    ),
+                    Expanded(
+                      child: Slider(
+                        value: brightness,
+                        onChanged: (value) {
+                          brightness = value;
+                          enhanceImage();
+                          setState(() {
+                            brightness;
+                          });
+                        },
+                        min: 1,
+                        max: 10,
+                        divisions: 9,
+                        label: brightness.toStringAsFixed(2),
+                        activeColor: Colors.blueAccent,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
