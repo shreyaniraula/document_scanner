@@ -2,6 +2,9 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
+import 'package:image_editor_plus/image_editor_plus.dart';
+import 'package:media_store_plus/media_store_plus.dart';
+import 'package:path_provider/path_provider.dart';
 
 class EnhanceScreen extends StatefulWidget {
   File image;
@@ -17,12 +20,18 @@ class _EnhanceScreenState extends State<EnhanceScreen> {
   void initState() {
     super.initState();
     inputImage = img.decodeImage(widget.image.readAsBytesSync())!;
+    initMediaStore();
     enhanceImage();
+  }
+
+  initMediaStore() async {
+    await MediaStore.ensureInitialized();
+    MediaStore.appFolder = "DocumentScanner";
   }
 
   enhanceImage() {
     img.Image temp = img.decodeImage(widget.image.readAsBytesSync())!;
-    inputImage = img.adjustColor(temp, brightness: 2);
+    inputImage = img.adjustColor(temp, brightness: brightness);
     inputImage = img.contrast(inputImage, contrast: contrast);
     setState(() {
       inputImage;
@@ -40,6 +49,58 @@ class _EnhanceScreenState extends State<EnhanceScreen> {
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
         title: Text('Enhance', style: TextStyle(color: Colors.white)),
+        actions: [
+          InkWell(
+            onTap: () async {
+              // Write to a temporary file first
+              final bytes = Uint8List.fromList(img.encodePng(inputImage));
+              final tempDir = await getTemporaryDirectory();
+              final tempFile = File(
+                "${tempDir.path}/enhanced_${DateTime.now().millisecondsSinceEpoch}.png",
+              );
+              await tempFile.writeAsBytes(bytes);
+
+              final mediaStore = MediaStore();
+              final saveInfo = await mediaStore.saveFile(
+                tempFilePath: tempFile.path,
+                dirType: DirType.photo,
+                dirName: DirName.pictures,
+              );
+
+              print("Saved to gallery at: ${saveInfo?.uri}");
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Image saved to gallery.')),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.save_alt),
+            ),
+          ),
+          InkWell(
+            onTap: () async {
+              final editedImage = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return ImageFilters(
+                      image: Uint8List.fromList(img.encodePng(inputImage)),
+                    );
+                  },
+                ),
+              );
+              inputImage = img.decodeImage(editedImage)!;
+              setState(() {
+                inputImage;
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.filter),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: SizedBox(
